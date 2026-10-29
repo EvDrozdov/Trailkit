@@ -16,13 +16,13 @@ local DROP_COLOR = { 0.56, 0.89, 0.84 } -- бирюзовая подсветка
 -- Нарезка в три части, координаты — в пикселях текстуры; подгоняются руками.
 local BRANCH_FILE = 525287
 local BRANCH_TEX_W, BRANCH_TEX_H = 256, 64
-local BRANCH_LEFT = 40   -- ширина левого конца с листьями
-local BRANCH_RIGHT = 40  -- ширина правого конца с листьями
+local BRANCH_LEFT = 48   -- ширина левого конца с листьями
+local BRANCH_RIGHT = 48  -- ширина правого конца с листьями
 local BRANCH_TOP = 0     -- верх используемой области текстуры
 local BRANCH_BOTTOM = 64 -- низ используемой области текстуры
 -- Отступы кнопок от краёв рамки, в экранных пикселях
-local BRANCH_PAD_X = 16
-local BRANCH_PAD_Y = 10
+local BRANCH_PAD_X = 40
+local BRANCH_PAD_Y = 18
 
 -- Рамка 1px из WHITE8X8 (+ фон, если задан)
 local function StyleBackdrop(frame, bg, border)
