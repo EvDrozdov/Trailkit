@@ -1,6 +1,13 @@
 # Trailkit
 
-Compact hunter bars for **WoW Forever**: one panel for your aspects, one for your traps, right above the main action bar.
+Compact hunter bars for **World of Warcraft: Midnight** and **WoW Forever**: one panel for your aspects, one for your traps, right above the main action bar.
+
+## Supported clients
+
+- **Midnight (retail):** Aspect of the Cheetah, Aspect of the Turtle, Aspect of the Eagle; Freezing, Tar, High Explosive, Implosive and Steel Trap.
+- **WoW Forever:** all aspects (Monkey, Hawk, Cheetah, Pack, Beast, Wild) and traps (Immolation, Freezing, Frost, Explosive), with spell ranks.
+
+The client is detected automatically. Only spells you have learned are shown, so talents of other specializations stay hidden.
 
 ## Features
 
