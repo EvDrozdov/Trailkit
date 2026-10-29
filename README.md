@@ -11,7 +11,8 @@ Compact hunter bars for **WoW Forever**: one panel for your aspects, one for you
 - Tooltips on hover.
 - Move panels when unlocked (out of combat only). Panels are locked by default.
 - Reorder icons with Shift + drag, like in FloAspectBar (out of combat, works whether the panels are locked or not).
-- Right-click menu: Lock, Prevent icon reordering, Scale, Hide panel, Reset position.
+- Two looks: **Blizzard** (default, matches the standard action buttons) and **Night Elf** (moon-silver frames on a dark violet panel).
+- Right-click menu: Lock, Prevent icon reordering, Style, Scale, Hide panel, Reset position.
 - Test mode with placeholder icons that works on any class.
 - Settings are saved account-wide, with a per-character backup copy restored automatically if needed.
 - Localized for all WoW client languages: English, Russian, German, French, Spanish (EU and LatAm), Italian, Portuguese (BR), Korean, Simplified and Traditional Chinese.

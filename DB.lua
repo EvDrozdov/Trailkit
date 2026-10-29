@@ -8,6 +8,7 @@ ns.DB = DB
 local DEFAULTS = {
     locked = true,
     lockIcons = false,
+    style = "blizzard",
     bars = {
         aspects = { point = "BOTTOMRIGHT", relPoint = "BOTTOM", x = -20, y = 160, scale = 1, hidden = false },
         traps   = { point = "BOTTOMLEFT",  relPoint = "BOTTOM", x = 20,  y = 160, scale = 1, hidden = false },
@@ -24,6 +25,7 @@ local function IsNumber(v) return type(v) == "number" and v == v end
 local function IsBool(v) return type(v) == "boolean" end
 local function IsPoint(v) return type(v) == "string" and POINTS[v] == true end
 local function IsScale(v) return IsNumber(v) and v >= 0.5 and v <= 2 end
+local function IsStyle(v) return v == "blizzard" or v == "nightelf" end
 
 local function IsOrder(v)
     if type(v) ~= "table" then return false end
@@ -66,6 +68,7 @@ function DB.Load()
     local db = { rev = math.max(Rev(main), Rev(backup), 0), bars = {} }
     db.locked = Pick({ first, second }, "locked", IsBool, DEFAULTS.locked)
     db.lockIcons = Pick({ first, second }, "lockIcons", IsBool, DEFAULTS.lockIcons)
+    db.style = Pick({ first, second }, "style", IsStyle, DEFAULTS.style)
     for name, def in pairs(DEFAULTS.bars) do
         local s = { Sub(first, "bars", name), Sub(second, "bars", name) }
         db.bars[name] = {

@@ -34,6 +34,13 @@ function ns.SetScale(bar, value)
     ns.Print(L.MSG_SCALE:format(value))
 end
 
+function ns.SetStyle(style)
+    if CombatBlocked() then return end
+    ns.db.style = style
+    ns.DB.Save()
+    Bar.RebuildAll()
+end
+
 function ns.HideBar(bar)
     if CombatBlocked() then return end
     ns.db.bars[bar.name].hidden = true

@@ -33,6 +33,14 @@ function Menu.Open(bar)
                 function() ns.SetScale(bar, value) end)
         end
 
+        local style = root:CreateButton(L.STYLE)
+        style:SetEnabled(OutOfCombat)
+        for _, value in ipairs({ "blizzard", "nightelf" }) do
+            style:CreateRadio(value == "blizzard" and L.STYLE_BLIZZARD or L.STYLE_NIGHTELF,
+                function() return ns.db.style == value end,
+                function() ns.SetStyle(value) end)
+        end
+
         root:CreateButton(L.HIDE_PANEL, function() ns.HideBar(bar) end):SetEnabled(OutOfCombat)
         root:CreateButton(L.RESET_POSITION, function() ns.ResetBars(bar) end):SetEnabled(OutOfCombat)
     end)
