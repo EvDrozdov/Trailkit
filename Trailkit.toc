@@ -1,0 +1,15 @@
+## Interface: 16001, __RETAIL_INTERFACE__
+# ЗАГЛУШКА: замени __RETAIL_INTERFACE__ на номер ретейла (в игре: /dump select(4, GetBuildInfo()))
+## Title: Trailkit
+## Notes: Hunter aspect and trap bars.
+## Author: Evgeny Drozdov
+## Version: 0.1.0
+## SavedVariables: TrailkitDB
+## SavedVariablesPerCharacter: TrailkitBackupDB
+
+Locales.lua
+Spells.lua
+DB.lua
+Bar.lua
+Menu.lua
+Core.lua
