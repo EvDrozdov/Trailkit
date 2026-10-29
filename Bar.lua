@@ -101,7 +101,8 @@ end
 local function CreateButton(bar, i)
     local btn = CreateFrame("Button", bar:GetName() .. "Button" .. i, bar, "SecureActionButtonTemplate")
     btn:SetSize(BUTTON_SIZE, BUTTON_SIZE)
-    btn:RegisterForClicks("AnyUp")
+    -- Up и Down: secure-шаблон сам выбирает по CVar ActionButtonUseKeyDown
+    btn:RegisterForClicks("AnyUp", "AnyDown")
     -- Shift+клик не кастует: пустой тип перекрывает type=spell
     btn:SetAttribute("shift-type1", "")
     btn:RegisterForDrag("LeftButton")
