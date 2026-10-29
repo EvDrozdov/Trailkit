@@ -7,6 +7,7 @@ ns.DB = DB
 
 local DEFAULTS = {
     locked = true,
+    lockIcons = false,
     bars = {
         aspects = { point = "BOTTOMRIGHT", relPoint = "BOTTOM", x = -20, y = 160, scale = 1, hidden = false },
         traps   = { point = "BOTTOMLEFT",  relPoint = "BOTTOM", x = 20,  y = 160, scale = 1, hidden = false },
@@ -64,6 +65,7 @@ function DB.Load()
 
     local db = { rev = math.max(Rev(main), Rev(backup), 0), bars = {} }
     db.locked = Pick({ first, second }, "locked", IsBool, DEFAULTS.locked)
+    db.lockIcons = Pick({ first, second }, "lockIcons", IsBool, DEFAULTS.lockIcons)
     for name, def in pairs(DEFAULTS.bars) do
         local s = { Sub(first, "bars", name), Sub(second, "bars", name) }
         db.bars[name] = {

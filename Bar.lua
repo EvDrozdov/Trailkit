@@ -47,9 +47,14 @@ local function OrderedEntries(bar)
     return list
 end
 
--- Можно ли сейчас двигать панели и иконки
-function Bar.CanEdit()
+-- Перемещение панелей: при снятом замке и вне боя
+function Bar.CanMovePanel()
     return not ns.db.locked and not InCombatLockdown()
+end
+
+-- Перестановка иконок: вне боя, если не запрещена галочкой (замок панелей не влияет)
+function Bar.CanReorder()
+    return not ns.db.lockIcons and not InCombatLockdown()
 end
 
 local function OnEnter(self)
@@ -61,20 +66,45 @@ local function OnEnter(self)
         GameTooltip:AddLine(L.TOOLTIP_TEST, 1, 0.82, 0)
     end
     if not InCombatLockdown() then
+        if Bar.CanReorder() then
+            GameTooltip:AddLine(L.TOOLTIP_REORDER, 0.6, 0.6, 0.6)
+        end
         GameTooltip:AddLine(L.TOOLTIP_MENU, 0.6, 0.6, 0.6)
     end
     GameTooltip:Show()
 end
 
 local function OnMouseUp(self, button)
-    if button == "RightButton" then ns.Menu.Open(self.bar, self) end
+    if button == "RightButton" then ns.Menu.Open(self.bar) end
+end
+
+-- Shift + перетаскивание: поменять иконку местами с той, над которой отпустили
+local function OnDragStart(self)
+    if not (IsShiftKeyDown() and Bar.CanReorder()) then return end
+    Bar.dragging = self
+    self:SetAlpha(0.5)
+end
+
+local function OnDragStop(self)
+    if Bar.dragging ~= self then return end
+    Bar.dragging = nil
+    self:SetAlpha(1)
+    if not Bar.CanReorder() then return end
+    for _, target in ipairs(self.bar.buttons) do
+        if target ~= self and target:IsShown() and target:IsMouseOver() then
+            Bar.Swap(self.bar, self, target)
+            return
+        end
+    end
 end
 
 local function CreateButton(bar, i)
     local btn = CreateFrame("Button", bar:GetName() .. "Button" .. i, bar, "SecureActionButtonTemplate")
     btn:SetSize(BUTTON_SIZE, BUTTON_SIZE)
-    -- Down и Up: secure-шаблон сам выбирает по CVar ActionButtonUseKeyDown
-    btn:RegisterForClicks("LeftButtonUp", "LeftButtonDown")
+    btn:RegisterForClicks("AnyUp")
+    -- Shift+клик не кастует: пустой тип перекрывает type=spell
+    btn:SetAttribute("shift-type1", "")
+    btn:RegisterForDrag("LeftButton")
     btn.bar = bar
 
     btn.icon = btn:CreateTexture(nil, "ARTWORK")
@@ -99,6 +129,8 @@ local function CreateButton(bar, i)
     btn:SetScript("OnEnter", OnEnter)
     btn:SetScript("OnLeave", GameTooltip_Hide)
     btn:SetScript("OnMouseUp", OnMouseUp)
+    btn:SetScript("OnDragStart", OnDragStart)
+    btn:SetScript("OnDragStop", OnDragStop)
     return btn
 end
 
@@ -131,7 +163,7 @@ function Bar.Create(name, title)
     text:SetPoint("CENTER")
     text:SetText(title)
     handle:SetScript("OnDragStart", function()
-        if Bar.CanEdit() then
+        if Bar.CanMovePanel() then
             bar.moving = true
             bar:StartMoving()
         end
@@ -249,24 +281,8 @@ function Bar.UpdateAuras()
     end
 end
 
--- Соседняя видимая кнопка в направлении delta (-1/1)
-local function Neighbor(bar, btn, delta)
-    for i, b in ipairs(bar.buttons) do
-        if b == btn then
-            local other = bar.buttons[i + delta]
-            return other and other:IsShown() and other or nil
-        end
-    end
-end
-
-function Bar.CanMove(bar, btn, delta)
-    return Bar.CanEdit() and Neighbor(bar, btn, delta) ~= nil
-end
-
--- Поменять иконку местами с соседней
-function Bar.Move(bar, btn, delta)
-    if not Bar.CanMove(bar, btn, delta) then return end
-    local other = Neighbor(bar, btn, delta)
+-- Поменять две иконки панели местами
+function Bar.Swap(bar, btn, other)
     local keys, a, b = {}, nil, nil
     for i, entry in ipairs(OrderedEntries(bar)) do
         keys[i] = entry.key

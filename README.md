@@ -9,8 +9,9 @@ Compact hunter bars for **WoW Forever**: one panel for your aspects, one for you
 - Active aspect is highlighted with a border (any rank counts).
 - Cooldown swipe and countdown numbers on every icon.
 - Tooltips on hover.
-- Move panels and reorder icons when unlocked (out of combat only). Panels are locked by default.
-- Right-click menu: Lock, Scale, Hide panel, Reset position.
+- Move panels when unlocked (out of combat only). Panels are locked by default.
+- Reorder icons with Shift + drag, like in FloAspectBar (out of combat, works whether the panels are locked or not).
+- Right-click menu: Lock, Prevent icon reordering, Scale, Hide panel, Reset position.
 - Test mode with placeholder icons that works on any class.
 - Settings are saved account-wide, with a per-character backup copy restored automatically if needed.
 - Localized for all WoW client languages: English, Russian, German, French, Spanish (EU and LatAm), Italian, Portuguese (BR), Korean, Simplified and Traditional Chinese.
@@ -18,8 +19,8 @@ Compact hunter bars for **WoW Forever**: one panel for your aspects, one for you
 ## Usage
 
 - **Unlock:** `/tk unlock`. A title bar appears on each panel; drag it to move the panel.
-- **Reorder icons:** while unlocked, right-click an icon and choose *Move left* / *Move right*.
 - **Lock again:** `/tk lock` or *Lock* in the right-click menu.
+- **Reorder icons:** hold Shift and drag an icon onto another one to swap them. Shift-click never casts. To turn this off, check *Prevent icon reordering* in the right-click menu.
 
 ## Commands
 
@@ -27,8 +28,8 @@ Compact hunter bars for **WoW Forever**: one panel for your aspects, one for you
 
 | Command | Description |
 |---|---|
-| `lock` | Lock panels and icons |
-| `unlock` | Unlock panels and icons for moving |
+| `lock` | Lock panels in place |
+| `unlock` | Unlock panels for moving |
 | `scale <0.5–2>` | Set the scale of both panels |
 | `reset` | Reset positions and show hidden panels |
 | `test` | Toggle test mode with placeholder icons |
