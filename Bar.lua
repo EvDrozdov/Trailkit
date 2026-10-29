@@ -7,8 +7,37 @@ ns.Bar = Bar
 
 local BUTTON_SIZE = 36
 local SPACING = 4
-local PADDING = 4
+local PADDING = 6
 local PLACEHOLDER_ICON = 134400 -- знак вопроса
+local WHITE = "Interface\\Buttons\\WHITE8X8"
+
+local function Hex(hex, a)
+    return {
+        tonumber(hex:sub(1, 2), 16) / 255,
+        tonumber(hex:sub(3, 4), 16) / 255,
+        tonumber(hex:sub(5, 6), 16) / 255,
+        a or 1,
+    }
+end
+
+-- Палитра в стиле ночных эльфов
+local COLORS = {
+    border = Hex("AEBBD2"),       -- лунное серебро
+    inner = Hex("1B1430"),        -- внутренняя тёмная обводка
+    hover = Hex("8FE3D6"),        -- бирюзовое свечение
+    active = Hex("A47CFF"),       -- свечение активного аспекта
+    activeBorder = Hex("D7C8FF"), -- рамка активного аспекта
+    panelBg = Hex("241842", 0.6),
+    panelBorder = Hex("8C98B4"),
+    panelLine = Hex("A47CFF", 0.35),
+}
+
+-- Рамка 1px из WHITE8X8 (+ фон, если задан)
+local function StyleBackdrop(frame, bg, border)
+    frame:SetBackdrop({ bgFile = bg and WHITE or nil, edgeFile = WHITE, edgeSize = 1 })
+    if bg then frame:SetBackdropColor(unpack(bg)) end
+    frame:SetBackdropBorderColor(unpack(border))
+end
 
 -- issecretvalue может отсутствовать в клиенте без secret values
 local issecret = issecretvalue or function() return false end
@@ -74,7 +103,13 @@ local function OnEnter(self)
     GameTooltip:Show()
 end
 
+-- Нажатие: затемнение иконки
+local function OnMouseDown(self, button)
+    if button == "LeftButton" then self.icon:SetVertexColor(0.5, 0.5, 0.5) end
+end
+
 local function OnMouseUp(self, button)
+    self.icon:SetVertexColor(1, 1, 1)
     if button == "RightButton" then ns.Menu.Open(self.bar) end
 end
 
@@ -108,27 +143,43 @@ local function CreateButton(bar, i)
     btn:RegisterForDrag("LeftButton")
     btn.bar = bar
 
+    -- Серебряная рамка 2px, под ней тёмная обводка 1px, затем иконка
+    btn.border = btn:CreateTexture(nil, "BACKGROUND")
+    btn.border:SetTexture(WHITE)
+    btn.border:SetAllPoints()
+    btn.border:SetVertexColor(unpack(COLORS.border))
+    local inner = btn:CreateTexture(nil, "BORDER")
+    inner:SetTexture(WHITE)
+    inner:SetPoint("TOPLEFT", 2, -2)
+    inner:SetPoint("BOTTOMRIGHT", -2, 2)
+    inner:SetVertexColor(unpack(COLORS.inner))
+
     btn.icon = btn:CreateTexture(nil, "ARTWORK")
-    btn.icon:SetAllPoints()
+    btn.icon:SetPoint("TOPLEFT", 3, -3)
+    btn.icon:SetPoint("BOTTOMRIGHT", -3, 3)
     btn.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+
     btn:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+    btn:GetHighlightTexture():SetVertexColor(unpack(COLORS.hover))
 
     btn.cooldown = CreateFrame("Cooldown", nil, btn, "CooldownFrameTemplate")
-    btn.cooldown:SetAllPoints()
+    btn.cooldown:SetAllPoints(btn.icon)
     btn.cooldown:SetHideCountdownNumbers(false)
 
-    -- Рамка активного аспекта поверх затемнения кулдауна
+    -- Свечение активного аспекта поверх затемнения кулдауна
     local overlay = CreateFrame("Frame", nil, btn)
     overlay:SetAllPoints()
     overlay:SetFrameLevel(btn.cooldown:GetFrameLevel() + 1)
     btn.glow = overlay:CreateTexture(nil, "OVERLAY")
     btn.glow:SetTexture("Interface\\Buttons\\CheckButtonHilight")
     btn.glow:SetBlendMode("ADD")
+    btn.glow:SetVertexColor(unpack(COLORS.active))
     btn.glow:SetAllPoints()
     btn.glow:Hide()
 
     btn:SetScript("OnEnter", OnEnter)
     btn:SetScript("OnLeave", GameTooltip_Hide)
+    btn:SetScript("OnMouseDown", OnMouseDown)
     btn:SetScript("OnMouseUp", OnMouseUp)
     btn:SetScript("OnDragStart", OnDragStart)
     btn:SetScript("OnDragStop", OnDragStop)
@@ -136,7 +187,7 @@ local function CreateButton(bar, i)
 end
 
 function Bar.Create(name, title)
-    local bar = CreateFrame("Frame", "TrailkitBar_" .. name, UIParent)
+    local bar = CreateFrame("Frame", "TrailkitBar_" .. name, UIParent, "BackdropTemplate")
     bar.name, bar.title, bar.buttons = name, title, {}
     bar:SetMovable(true)
     bar:SetClampedToScreen(true)
@@ -146,20 +197,21 @@ function Bar.Create(name, title)
         if button == "RightButton" then ns.Menu.Open(bar) end
     end)
 
-    bar.bg = bar:CreateTexture(nil, "BACKGROUND")
-    bar.bg:SetAllPoints()
-    bar.bg:SetColorTexture(0, 0, 0, 0.4)
+    -- Подложка: тёмно-фиолетовый фон, рамка и тонкая внутренняя фиолетовая линия
+    StyleBackdrop(bar, COLORS.panelBg, COLORS.panelBorder)
+    local line = CreateFrame("Frame", nil, bar, "BackdropTemplate")
+    line:SetPoint("TOPLEFT", 2, -2)
+    line:SetPoint("BOTTOMRIGHT", -2, 2)
+    StyleBackdrop(line, nil, COLORS.panelLine)
 
     -- Заголовок-ручка для перетаскивания, виден только при снятом замке
-    local handle = CreateFrame("Frame", nil, bar)
-    handle:SetPoint("BOTTOMLEFT", bar, "TOPLEFT")
-    handle:SetPoint("BOTTOMRIGHT", bar, "TOPRIGHT")
+    local handle = CreateFrame("Frame", nil, bar, "BackdropTemplate")
+    handle:SetPoint("BOTTOMLEFT", bar, "TOPLEFT", 0, 1)
+    handle:SetPoint("BOTTOMRIGHT", bar, "TOPRIGHT", 0, 1)
     handle:SetHeight(16)
     handle:EnableMouse(true)
     handle:RegisterForDrag("LeftButton")
-    local hbg = handle:CreateTexture(nil, "BACKGROUND")
-    hbg:SetAllPoints()
-    hbg:SetColorTexture(0.67, 0.83, 0.45, 0.5)
+    StyleBackdrop(handle, Hex("241842", 0.85), COLORS.panelBorder)
     local text = handle:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     text:SetPoint("CENTER")
     text:SetText(title)
@@ -193,9 +245,7 @@ end
 
 -- Только визуал замка, secure-фреймы не трогает — можно и в бою
 function Bar.UpdateLock(bar)
-    local unlocked = not ns.db.locked
-    bar.handle:SetShown(unlocked)
-    bar.bg:SetShown(unlocked)
+    bar.handle:SetShown(not ns.db.locked)
 end
 
 -- Пересобрать кнопки панели. Только вне боя.
@@ -278,7 +328,9 @@ function Bar.UpdateAuras()
         else
             btn.active = false
         end
-        btn.glow:SetShown(btn.active == true)
+        local active = btn.active == true
+        btn.glow:SetShown(active)
+        btn.border:SetVertexColor(unpack(active and COLORS.activeBorder or COLORS.border))
     end
 end
 
