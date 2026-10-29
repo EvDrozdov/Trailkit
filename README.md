@@ -18,7 +18,7 @@ The client is detected automatically. Only spells you have learned are shown, so
 - Tooltips on hover.
 - Move panels when unlocked (out of combat only). Panels are locked by default.
 - Reorder icons with Shift + drag, like in FloAspectBar (out of combat, works whether the panels are locked or not).
-- Two looks: **Blizzard** (default, matches the standard action buttons) and **Night Elf** (moon-silver frames on a dark violet panel).
+- Two looks: **Blizzard** (default, matches the standard action buttons) and **Night Elf** (the same buttons inside a leafy branch frame; unavailable if the client lacks that texture).
 - Right-click menu: Lock, Prevent icon reordering, Style, Scale, Hide panel, Reset position.
 - Test mode with placeholder icons that works on any class.
 - Settings are saved account-wide, with a per-character backup copy restored automatically if needed.

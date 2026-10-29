@@ -5,34 +5,24 @@ local L = ns.L
 local Bar = {}
 ns.Bar = Bar
 
--- Размеры по стилям: Blizzard — как кнопки основной панели действий
-local LAYOUT = {
-    blizzard = { size = 45, spacing = 2, padding = 0 },
-    nightelf = { size = 36, spacing = 4, padding = 6 },
-}
+-- Кнопки в обоих стилях — как кнопки основной панели действий
+local BUTTON_SIZE = 45
+local SPACING = 2
 local PLACEHOLDER_ICON = 134400 -- знак вопроса
 local WHITE = "Interface\\Buttons\\WHITE8X8"
+local DROP_COLOR = { 0.56, 0.89, 0.84 } -- бирюзовая подсветка цели при Shift+drag (#8FE3D6)
 
-local function Hex(hex, a)
-    return {
-        tonumber(hex:sub(1, 2), 16) / 255,
-        tonumber(hex:sub(3, 4), 16) / 255,
-        tonumber(hex:sub(5, 6), 16) / 255,
-        a or 1,
-    }
-end
-
--- Палитра в стиле ночных эльфов
-local COLORS = {
-    border = Hex("AEBBD2"),       -- лунное серебро
-    inner = Hex("1B1430"),        -- внутренняя тёмная обводка
-    hover = Hex("8FE3D6"),        -- бирюзовое свечение
-    active = Hex("A47CFF"),       -- свечение активного аспекта
-    activeBorder = Hex("D7C8FF"), -- рамка активного аспекта
-    panelBg = Hex("241842", 0.6),
-    panelBorder = Hex("8C98B4"),
-    panelLine = Hex("A47CFF", 0.35),
-}
+-- Рамка-ветка стиля «Ночные эльфы»: interface/unitpowerbaralt/druid_horizontal_frame.blp.
+-- Нарезка в три части, координаты — в пикселях текстуры; подгоняются руками.
+local BRANCH_FILE = 525287
+local BRANCH_TEX_W, BRANCH_TEX_H = 256, 64
+local BRANCH_LEFT = 40   -- ширина левого конца с листьями
+local BRANCH_RIGHT = 40  -- ширина правого конца с листьями
+local BRANCH_TOP = 0     -- верх используемой области текстуры
+local BRANCH_BOTTOM = 64 -- низ используемой области текстуры
+-- Отступы кнопок от краёв рамки, в экранных пикселях
+local BRANCH_PAD_X = 16
+local BRANCH_PAD_Y = 10
 
 -- Рамка 1px из WHITE8X8 (+ фон, если задан)
 local function StyleBackdrop(frame, bg, border)
@@ -41,13 +31,14 @@ local function StyleBackdrop(frame, bg, border)
     frame:SetBackdropBorderColor(unpack(border))
 end
 
-local function IsBlizzard() return ns.db.style == "blizzard" end
+local function IsNightElf() return ns.db.style == "nightelf" end
 
 -- issecretvalue может отсутствовать в клиенте без secret values
 local issecret = issecretvalue or function() return false end
 
 Bar.frames = {}
 Bar.pending = false -- пересборка отложена до выхода из боя
+Bar.branchAvailable = false -- загрузилась ли текстура ветки (проверяется в Bar.Create)
 
 local function Cfg(bar) return ns.db.bars[bar.name] end
 
@@ -107,15 +98,10 @@ local function OnEnter(self)
     GameTooltip:Show()
 end
 
--- Эффект нажатия: Blizzard — родная рамка нажатия, ночные эльфы — затемнение иконки
+-- Эффект нажатия: родная рамка нажатия вместо обычной
 local function SetPressed(btn, pressed)
-    if IsBlizzard() then
-        btn.pushed:SetShown(pressed)
-        btn.normal:SetShown(not pressed)
-    else
-        local c = pressed and 0.5 or 1
-        btn.icon:SetVertexColor(c, c, c)
-    end
+    btn.pushed:SetShown(pressed)
+    btn.normal:SetShown(not pressed)
 end
 
 -- С зажатым Shift эффект нажатия не показываем: Shift+клик не кастует
@@ -191,16 +177,18 @@ local function OnDragStop(self)
 end
 
 -- Текстура размером с рамку ActionButtonTemplate (46x45 от левого верхнего угла)
-local function ActionFrameTexture(btn, layer, sublevel, atlas)
-    local tex = btn:CreateTexture(nil, layer, nil, sublevel)
+local function ActionFrameTexture(parent, layer, sublevel, atlas)
+    local tex = parent:CreateTexture(nil, layer, nil, sublevel)
     tex:SetAtlas(atlas)
     tex:SetSize(46, 45)
     tex:SetPoint("TOPLEFT")
     return tex
 end
 
+-- Кнопка с оформлением ActionButtonTemplate: маска иконки, рамка, нажатие, подсветка, «checked»
 local function CreateButton(bar, i)
     local btn = CreateFrame("Button", bar:GetName() .. "Button" .. i, bar, "SecureActionButtonTemplate")
+    btn:SetSize(BUTTON_SIZE, BUTTON_SIZE)
     -- Up и Down: secure-шаблон сам выбирает по CVar ActionButtonUseKeyDown
     btn:RegisterForClicks("AnyUp", "AnyDown")
     -- Shift+клик не кастует: пустой тип перекрывает type=spell
@@ -209,52 +197,33 @@ local function CreateButton(bar, i)
     btn.bar = bar
 
     btn.icon = btn:CreateTexture(nil, "ARTWORK")
-
-    -- Ночные эльфы: серебряная рамка 2px, под ней тёмная обводка 1px
-    btn.border = btn:CreateTexture(nil, "BACKGROUND")
-    btn.border:SetTexture(WHITE)
-    btn.border:SetAllPoints()
-    btn.border:SetVertexColor(unpack(COLORS.border))
-    btn.inner = btn:CreateTexture(nil, "BORDER")
-    btn.inner:SetTexture(WHITE)
-    btn.inner:SetPoint("TOPLEFT", 2, -2)
-    btn.inner:SetPoint("BOTTOMRIGHT", -2, 2)
-    btn.inner:SetVertexColor(unpack(COLORS.inner))
-    btn.hlNE = btn:CreateTexture(nil, "HIGHLIGHT")
-    btn.hlNE:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
-    btn.hlNE:SetBlendMode("ADD")
-    btn.hlNE:SetVertexColor(unpack(COLORS.hover))
-    btn.hlNE:SetAllPoints()
-
-    -- Blizzard: маска иконки, рамка, нажатие, подсветка и «checked» как у ActionButtonTemplate
+    btn.icon:SetAllPoints()
     btn.mask = btn:CreateMaskTexture()
     btn.mask:SetAtlas("UI-HUD-ActionBar-IconFrame-Mask")
     btn.mask:SetAllPoints(btn.icon)
+    btn.icon:AddMaskTexture(btn.mask)
+
     btn.normal = ActionFrameTexture(btn, "ARTWORK", 1, "UI-HUD-ActionBar-IconFrame")
     btn.pushed = ActionFrameTexture(btn, "ARTWORK", 1, "UI-HUD-ActionBar-IconFrame-Down")
+    btn.pushed:Hide()
     btn.checked = ActionFrameTexture(btn, "ARTWORK", 2, "UI-HUD-ActionBar-IconFrame-Mouseover")
     btn.checked:SetBlendMode("ADD")
-    btn.hlBZ = ActionFrameTexture(btn, "HIGHLIGHT", 0, "UI-HUD-ActionBar-IconFrame-Mouseover")
-    btn.hlBZ:SetBlendMode("ADD")
+    btn.checked:Hide()
+    local highlight = ActionFrameTexture(btn, "HIGHLIGHT", 0, "UI-HUD-ActionBar-IconFrame-Mouseover")
+    highlight:SetBlendMode("ADD")
 
     btn.cooldown = CreateFrame("Cooldown", nil, btn, "CooldownFrameTemplate")
+    btn.cooldown:SetPoint("TOPLEFT", btn.icon, 3, -3)
+    btn.cooldown:SetPoint("BOTTOMRIGHT", btn.icon, -3, 3)
     btn.cooldown:SetHideCountdownNumbers(false)
 
-    -- Свечение активного аспекта поверх затемнения кулдауна
+    -- Подсветка цели при Shift+drag поверх затемнения кулдауна
     local overlay = CreateFrame("Frame", nil, btn)
     overlay:SetAllPoints()
     overlay:SetFrameLevel(btn.cooldown:GetFrameLevel() + 1)
-    btn.glow = overlay:CreateTexture(nil, "OVERLAY")
-    btn.glow:SetTexture("Interface\\Buttons\\CheckButtonHilight")
-    btn.glow:SetBlendMode("ADD")
-    btn.glow:SetVertexColor(unpack(COLORS.active))
-    btn.glow:SetAllPoints()
-    btn.glow:Hide()
-
-    -- Подсветка цели при Shift+drag (текстура задаётся в ApplyStyle)
-    btn.dropGlow = overlay:CreateTexture(nil, "OVERLAY")
+    btn.dropGlow = ActionFrameTexture(overlay, "OVERLAY", 0, "UI-HUD-ActionBar-IconFrame-Mouseover")
     btn.dropGlow:SetBlendMode("ADD")
-    btn.dropGlow:SetPoint("TOPLEFT")
+    btn.dropGlow:SetVertexColor(unpack(DROP_COLOR))
     btn.dropGlow:Hide()
 
     btn:SetScript("OnEnter", OnEnter)
@@ -266,69 +235,40 @@ local function CreateButton(bar, i)
     return btn
 end
 
--- Подсветка активного аспекта в текущем стиле
-local function RefreshActive(btn)
-    local active = btn.active == true
-    local bz = IsBlizzard()
-    btn.checked:SetShown(bz and active)
-    btn.glow:SetShown(not bz and active)
-    btn.border:SetVertexColor(unpack(active and not bz and COLORS.activeBorder or COLORS.border))
-end
+-- Рамка-ветка из трёх частей: концы фиксированной ширины, середина тянется.
+-- Возвращает false, если текстура не загрузилась.
+local function CreateBranch(bar)
+    local k = (BUTTON_SIZE + BRANCH_PAD_Y * 2) / (BRANCH_BOTTOM - BRANCH_TOP)
+    local top, bottom = BRANCH_TOP / BRANCH_TEX_H, BRANCH_BOTTOM / BRANCH_TEX_H
+    local l, r = BRANCH_LEFT / BRANCH_TEX_W, 1 - BRANCH_RIGHT / BRANCH_TEX_W
 
--- Применить стиль к кнопке. Меняет размер secure-кнопки — только вне боя.
-local function ApplyStyle(btn)
-    local bz = IsBlizzard()
-    local size = LAYOUT[ns.db.style].size
-    btn:SetSize(size, size)
+    local left = bar:CreateTexture(nil, "BACKGROUND")
+    local ok = left:SetTexture(BRANCH_FILE)
+    left:SetTexCoord(0, l, top, bottom)
+    left:SetPoint("TOPLEFT")
+    left:SetPoint("BOTTOMLEFT")
+    left:SetWidth(BRANCH_LEFT * k)
 
-    btn.border:SetShown(not bz)
-    btn.inner:SetShown(not bz)
-    btn.hlNE:SetShown(not bz)
-    btn.normal:SetShown(bz)
-    btn.hlBZ:SetShown(bz)
-    btn.pushed:Hide()
-    btn.icon:SetVertexColor(1, 1, 1)
+    local right = bar:CreateTexture(nil, "BACKGROUND")
+    right:SetTexture(BRANCH_FILE)
+    right:SetTexCoord(r, 1, top, bottom)
+    right:SetPoint("TOPRIGHT")
+    right:SetPoint("BOTTOMRIGHT")
+    right:SetWidth(BRANCH_RIGHT * k)
 
-    btn.icon:ClearAllPoints()
-    btn.cooldown:ClearAllPoints()
-    if bz then
-        btn.icon:SetAllPoints()
-        btn.icon:SetTexCoord(0, 1, 0, 1)
-        if not btn.masked then btn.icon:AddMaskTexture(btn.mask) end
-        btn.cooldown:SetPoint("TOPLEFT", btn.icon, 3, -3)
-        btn.cooldown:SetPoint("BOTTOMRIGHT", btn.icon, -3, 3)
-        btn.dropGlow:SetAtlas("UI-HUD-ActionBar-IconFrame-Mouseover")
-        btn.dropGlow:SetSize(46, 45)
-    else
-        btn.icon:SetPoint("TOPLEFT", 3, -3)
-        btn.icon:SetPoint("BOTTOMRIGHT", -3, 3)
-        btn.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-        if btn.masked then btn.icon:RemoveMaskTexture(btn.mask) end
-        btn.cooldown:SetAllPoints(btn.icon)
-        btn.dropGlow:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
-        btn.dropGlow:SetTexCoord(0, 1, 0, 1)
-        btn.dropGlow:SetSize(size, size)
-    end
-    btn.masked = bz
-    btn.dropGlow:SetVertexColor(unpack(COLORS.hover))
-    RefreshActive(btn)
-end
+    local middle = bar:CreateTexture(nil, "BACKGROUND")
+    middle:SetTexture(BRANCH_FILE)
+    middle:SetTexCoord(l, r, top, bottom)
+    middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
+    middle:SetPoint("BOTTOMRIGHT", right, "BOTTOMLEFT")
 
--- Подложка панели: только у ночных эльфов
-local function ApplyBarStyle(bar)
-    if IsBlizzard() then
-        bar:ClearBackdrop()
-        bar.line:Hide()
-        StyleBackdrop(bar.handle, { 0, 0, 0, 0.6 }, { 0.5, 0.5, 0.5, 1 })
-    else
-        StyleBackdrop(bar, COLORS.panelBg, COLORS.panelBorder)
-        bar.line:Show()
-        StyleBackdrop(bar.handle, Hex("241842", 0.85), COLORS.panelBorder)
-    end
+    bar.branch = { left, middle, right }
+    bar.branchMinWidth = (BRANCH_LEFT + BRANCH_RIGHT) * k
+    return ok ~= false and left:GetTexture() ~= nil
 end
 
 function Bar.Create(name, title)
-    local bar = CreateFrame("Frame", "TrailkitBar_" .. name, UIParent, "BackdropTemplate")
+    local bar = CreateFrame("Frame", "TrailkitBar_" .. name, UIParent)
     bar.name, bar.title, bar.buttons = name, title, {}
     bar:SetMovable(true)
     bar:SetClampedToScreen(true)
@@ -338,12 +278,7 @@ function Bar.Create(name, title)
         if button == "RightButton" then ns.Menu.Open(bar) end
     end)
 
-    -- Тонкая внутренняя фиолетовая линия подложки (стиль ночных эльфов)
-    local line = CreateFrame("Frame", nil, bar, "BackdropTemplate")
-    line:SetPoint("TOPLEFT", 2, -2)
-    line:SetPoint("BOTTOMRIGHT", -2, 2)
-    StyleBackdrop(line, nil, COLORS.panelLine)
-    bar.line = line
+    Bar.branchAvailable = CreateBranch(bar)
 
     -- Заголовок-ручка для перетаскивания, виден только при снятом замке
     local handle = CreateFrame("Frame", nil, bar, "BackdropTemplate")
@@ -352,6 +287,7 @@ function Bar.Create(name, title)
     handle:SetHeight(16)
     handle:EnableMouse(true)
     handle:RegisterForDrag("LeftButton")
+    StyleBackdrop(handle, { 0, 0, 0, 0.6 }, { 0.5, 0.5, 0.5, 1 })
     local text = handle:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     text:SetPoint("CENTER")
     text:SetText(title)
@@ -391,24 +327,37 @@ end
 -- Пересобрать кнопки панели. Только вне боя.
 function Bar.Rebuild(bar)
     local cfg = Cfg(bar)
-    local layout = LAYOUT[ns.db.style]
-    local count = 0
+    local entries = {}
     for _, entry in ipairs(OrderedEntries(bar)) do
         local spellID = not ns.testMode and HighestKnownRank(entry.ranks) or nil
         if ns.testMode or spellID then
-            count = count + 1
-            local btn = bar.buttons[count] or CreateButton(bar, count)
-            bar.buttons[count] = btn
-            if btn.entry ~= entry then btn.active = nil end
-            btn.entry, btn.spellID = entry, spellID
-            btn:SetAttribute("type", spellID and "spell" or nil)
-            btn:SetAttribute("spell", spellID)
-            btn.icon:SetTexture(spellID and C_Spell.GetSpellTexture(spellID) or PLACEHOLDER_ICON)
-            ApplyStyle(btn)
-            btn:ClearAllPoints()
-            btn:SetPoint("LEFT", bar, "LEFT", layout.padding + (count - 1) * (layout.size + layout.spacing), 0)
-            btn:Show()
+            entries[#entries + 1] = { entry = entry, spellID = spellID }
         end
+    end
+    local count = #entries
+
+    -- Размер панели: в стиле «Ночные эльфы» кнопки внутри рамки-ветки
+    local nightElf = IsNightElf()
+    local contentWidth = count * BUTTON_SIZE + math.max(count - 1, 0) * SPACING
+    local width, height = contentWidth, BUTTON_SIZE
+    if nightElf then
+        width = math.max(contentWidth + BRANCH_PAD_X * 2, bar.branchMinWidth)
+        height = BUTTON_SIZE + BRANCH_PAD_Y * 2
+    end
+    local x0 = (width - contentWidth) / 2
+    for _, tex in ipairs(bar.branch) do tex:SetShown(nightElf) end
+
+    for i, item in ipairs(entries) do
+        local btn = bar.buttons[i] or CreateButton(bar, i)
+        bar.buttons[i] = btn
+        if btn.entry ~= item.entry then btn.active = nil end
+        btn.entry, btn.spellID = item.entry, item.spellID
+        btn:SetAttribute("type", item.spellID and "spell" or nil)
+        btn:SetAttribute("spell", item.spellID)
+        btn.icon:SetTexture(item.spellID and C_Spell.GetSpellTexture(item.spellID) or PLACEHOLDER_ICON)
+        btn:ClearAllPoints()
+        btn:SetPoint("LEFT", bar, "LEFT", x0 + (i - 1) * (BUTTON_SIZE + SPACING), 0)
+        btn:Show()
     end
     for i = count + 1, #bar.buttons do
         local btn = bar.buttons[i]
@@ -418,9 +367,7 @@ function Bar.Rebuild(bar)
         btn.entry, btn.spellID, btn.active = nil, nil, nil
     end
 
-    ApplyBarStyle(bar)
-    bar:SetSize(layout.padding * 2 + count * layout.size + math.max(count - 1, 0) * layout.spacing,
-        layout.size + layout.padding * 2)
+    bar:SetSize(width, height)
     bar:SetScale(cfg.scale)
     bar:ClearAllPoints()
     bar:SetPoint(cfg.point, UIParent, cfg.relPoint, cfg.x, cfg.y)
@@ -463,7 +410,7 @@ local function AuraState(ranks)
     return false
 end
 
--- При неизвестном состоянии держим последнее известное
+-- Активный аспект — стандартная подсветка «checked»; при неизвестном состоянии держим последнее
 function Bar.UpdateAuras()
     for _, btn in ipairs(Bar.frames.aspects.buttons) do
         if btn.spellID then
@@ -472,7 +419,7 @@ function Bar.UpdateAuras()
         else
             btn.active = false
         end
-        RefreshActive(btn)
+        btn.checked:SetShown(btn.active == true)
     end
 end
 

@@ -36,6 +36,7 @@ end
 
 function ns.SetStyle(style)
     if CombatBlocked() then return end
+    if style == "nightelf" and not Bar.branchAvailable then return end
     ns.db.style = style
     ns.DB.Save()
     Bar.RebuildAll()
@@ -117,6 +118,13 @@ function handlers.ADDON_LOADED(name)
     Bar.Create("aspects", L.ASPECTS)
     Bar.Create("traps", L.TRAPS)
 
+    -- Нет текстуры ветки (например, в Forever) — стиль «Ночные эльфы» недоступен
+    if not Bar.branchAvailable and ns.db.style == "nightelf" then
+        ns.db.style = "blizzard"
+        ns.DB.Save()
+        ns.styleReset = true
+    end
+
     Register("PLAYER_LOGIN")
     Register("SPELLS_CHANGED")
     Register("PLAYER_SPECIALIZATION_CHANGED")
@@ -129,6 +137,7 @@ end
 function handlers.PLAYER_LOGIN()
     Bar.RebuildAll()
     if ns.DB.restored then ns.Print(L.MSG_RESTORED) end
+    if ns.styleReset then ns.Print(L.MSG_NIGHTELF_UNAVAILABLE) end
 end
 
 -- Изучение спеллов/рангов и смена спека

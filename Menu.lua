@@ -35,11 +35,14 @@ function Menu.Open(bar)
 
         local style = root:CreateButton(L.STYLE)
         style:SetEnabled(OutOfCombat)
-        for _, value in ipairs({ "blizzard", "nightelf" }) do
-            style:CreateRadio(value == "blizzard" and L.STYLE_BLIZZARD or L.STYLE_NIGHTELF,
-                function() return ns.db.style == value end,
-                function() ns.SetStyle(value) end)
-        end
+        style:CreateRadio(L.STYLE_BLIZZARD,
+            function() return ns.db.style == "blizzard" end,
+            function() ns.SetStyle("blizzard") end)
+        -- Недоступен, если в клиенте нет текстуры ветки
+        style:CreateRadio(L.STYLE_NIGHTELF,
+            function() return ns.db.style == "nightelf" end,
+            function() ns.SetStyle("nightelf") end)
+            :SetEnabled(function() return ns.Bar.branchAvailable end)
 
         root:CreateButton(L.HIDE_PANEL, function() ns.HideBar(bar) end):SetEnabled(OutOfCombat)
         root:CreateButton(L.RESET_POSITION, function() ns.ResetBars(bar) end):SetEnabled(OutOfCombat)
