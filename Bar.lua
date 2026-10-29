@@ -103,13 +103,19 @@ local function OnEnter(self)
     GameTooltip:Show()
 end
 
--- Нажатие: затемнение иконки
+-- Эффект нажатия: затемнение иконки
+local function SetPressed(btn, pressed)
+    local c = pressed and 0.5 or 1
+    btn.icon:SetVertexColor(c, c, c)
+end
+
+-- С зажатым Shift эффект нажатия не показываем: Shift+клик не кастует
 local function OnMouseDown(self, button)
-    if button == "LeftButton" then self.icon:SetVertexColor(0.5, 0.5, 0.5) end
+    if button == "LeftButton" and not IsShiftKeyDown() then SetPressed(self, true) end
 end
 
 local function OnMouseUp(self, button)
-    self.icon:SetVertexColor(1, 1, 1)
+    SetPressed(self, false)
     if button == "RightButton" then ns.Menu.Open(self.bar) end
 end
 
@@ -162,13 +168,14 @@ local function OnDragStart(self)
 end
 
 local function OnDragStop(self)
+    -- После отпускания кнопка всегда в обычном виде
+    SetPressed(self, false)
     if Bar.dragging ~= self then return end
     local target = FindDropTarget(self)
     Bar.dragging = nil
     SetDropTarget(nil)
     ghost:Hide()
     self:SetAlpha(1)
-    self.icon:SetVertexColor(1, 1, 1)
     if target and Bar.CanReorder() then
         Bar.Swap(self.bar, self, target)
     end
