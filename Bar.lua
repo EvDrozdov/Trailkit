@@ -113,23 +113,64 @@ local function OnMouseUp(self, button)
     if button == "RightButton" then ns.Menu.Open(self.bar) end
 end
 
--- Shift + перетаскивание: поменять иконку местами с той, над которой отпустили
+-- Shift + перетаскивание: поменять иконку местами с той, над которой отпустили.
+-- Копия иконки (ghost) едет за курсором, цель под курсором подсвечивается.
+local ghost
+
+local function FindDropTarget(src)
+    for _, target in ipairs(src.bar.buttons) do
+        if target ~= src and target:IsShown() and target:IsMouseOver() then return target end
+    end
+end
+
+local function SetDropTarget(target)
+    if Bar.dropTarget == target then return end
+    if Bar.dropTarget then Bar.dropTarget.dropGlow:Hide() end
+    Bar.dropTarget = target
+    if target then target.dropGlow:Show() end
+end
+
+local function GhostOnUpdate(self)
+    local x, y = GetCursorPosition()
+    local scale = UIParent:GetEffectiveScale()
+    self:ClearAllPoints()
+    self:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+    SetDropTarget(FindDropTarget(Bar.dragging))
+end
+
+local function ShowGhost(src)
+    if not ghost then
+        ghost = CreateFrame("Frame", nil, UIParent)
+        ghost:SetFrameStrata("TOOLTIP")
+        ghost:SetAlpha(0.85)
+        ghost.icon = ghost:CreateTexture(nil, "ARTWORK")
+        ghost.icon:SetAllPoints()
+        ghost.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        ghost:SetScript("OnUpdate", GhostOnUpdate)
+    end
+    local size = src.icon:GetWidth() * src:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    ghost:SetSize(size, size)
+    ghost.icon:SetTexture(src.icon:GetTexture())
+    ghost:Show()
+end
+
 local function OnDragStart(self)
     if not (IsShiftKeyDown() and Bar.CanReorder()) then return end
     Bar.dragging = self
-    self:SetAlpha(0.5)
+    self:SetAlpha(0.35)
+    ShowGhost(self)
 end
 
 local function OnDragStop(self)
     if Bar.dragging ~= self then return end
+    local target = FindDropTarget(self)
     Bar.dragging = nil
+    SetDropTarget(nil)
+    ghost:Hide()
     self:SetAlpha(1)
-    if not Bar.CanReorder() then return end
-    for _, target in ipairs(self.bar.buttons) do
-        if target ~= self and target:IsShown() and target:IsMouseOver() then
-            Bar.Swap(self.bar, self, target)
-            return
-        end
+    self.icon:SetVertexColor(1, 1, 1)
+    if target and Bar.CanReorder() then
+        Bar.Swap(self.bar, self, target)
     end
 end
 
@@ -176,6 +217,14 @@ local function CreateButton(bar, i)
     btn.glow:SetVertexColor(unpack(COLORS.active))
     btn.glow:SetAllPoints()
     btn.glow:Hide()
+
+    -- Подсветка цели при Shift+drag
+    btn.dropGlow = overlay:CreateTexture(nil, "OVERLAY")
+    btn.dropGlow:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    btn.dropGlow:SetBlendMode("ADD")
+    btn.dropGlow:SetVertexColor(unpack(COLORS.hover))
+    btn.dropGlow:SetAllPoints()
+    btn.dropGlow:Hide()
 
     btn:SetScript("OnEnter", OnEnter)
     btn:SetScript("OnLeave", GameTooltip_Hide)
