@@ -1,5 +1,4 @@
-## Interface: 16001, __RETAIL_INTERFACE__
-# ЗАГЛУШКА: замени __RETAIL_INTERFACE__ на номер ретейла (в игре: /dump select(4, GetBuildInfo()))
+## Interface: 16001, 120105 
 ## Title: Trailkit
 ## Notes: Hunter aspect and trap bars.
 ## Author: Evgeny Drozdov
