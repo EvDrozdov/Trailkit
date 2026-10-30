@@ -386,17 +386,35 @@ function Bar.RebuildAll()
     Bar.UpdateAuras()
 end
 
--- Значения кулдауна могут быть secret: не сравниваем, отдаём во фрейм Blizzard как есть
+-- Объект длительности (Midnight): принимает secret-значения из аддона, как CustomAuraButton Blizzard
+local GetCooldownDuration = C_Spell.GetSpellCooldownDuration
+
+local function UpdateCooldown(btn)
+    local cd = btn.cooldown
+    if not btn.spellID then
+        cd:Clear()
+    elseif GetCooldownDuration and cd.SetCooldownFromDurationObject then
+        local duration = GetCooldownDuration(btn.spellID)
+        if duration then
+            cd:SetCooldownFromDurationObject(duration, true)
+        else
+            cd:Clear()
+        end
+    else
+        -- Старый путь: SetCooldown из аддона не принимает secret — тогда пропускаем обновление
+        local info = C_Spell.GetSpellCooldown(btn.spellID)
+        if not info then
+            cd:Clear()
+        elseif not (issecret(info.startTime) or issecret(info.duration) or issecret(info.modRate)) then
+            cd:SetCooldown(info.startTime, info.duration, info.modRate)
+        end
+    end
+end
+
+-- Вызывается только по SPELL_UPDATE_COOLDOWN и при пересборке панелей
 function Bar.UpdateCooldowns()
     for _, bar in pairs(Bar.frames) do
-        for _, btn in ipairs(bar.buttons) do
-            local info = btn.spellID and C_Spell.GetSpellCooldown(btn.spellID)
-            if info then
-                btn.cooldown:SetCooldown(info.startTime, info.duration, info.modRate)
-            else
-                btn.cooldown:Clear()
-            end
-        end
+        for _, btn in ipairs(bar.buttons) do UpdateCooldown(btn) end
     end
 end
 
