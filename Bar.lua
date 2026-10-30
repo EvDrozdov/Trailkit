@@ -235,6 +235,28 @@ local function CreateButton(bar, i)
     return btn
 end
 
+-- Вспышка прока: шаблон и анимации те же, что у кнопок панелей Blizzard
+-- (ActionButtonSpellAlertManager). Свой фрейм вместо вызова менеджера — не пишем
+-- наши кнопки в его таблицу, чтобы не затронуть стандартные панели.
+local function SetAlert(btn, show)
+    local alert = btn.spellAlert
+    if show then
+        if not alert then
+            alert = CreateFrame("Frame", nil, btn, "ActionButtonSpellAlertTemplate")
+            alert:SetSize(BUTTON_SIZE * 1.4, BUTTON_SIZE * 1.4)
+            alert:SetPoint("CENTER")
+            alert:SetFrameLevel(btn.cooldown:GetFrameLevel() + 2)
+            btn.spellAlert = alert
+        end
+        if alert:IsShown() then return end
+        alert:Show()
+        alert.ProcStartAnim:Play()
+    elseif alert and alert:IsShown() then
+        alert:Hide()
+        alert.ProcStartAnim:Stop()
+    end
+end
+
 -- Рамка-ветка из трёх частей: концы фиксированной ширины, середина тянется.
 -- Возвращает false, если текстура не загрузилась.
 local function CreateBranch(bar)
@@ -365,6 +387,7 @@ function Bar.Rebuild(bar)
         btn:SetAttribute("type", nil)
         btn:SetAttribute("spell", nil)
         btn.entry, btn.spellID, btn.active = nil, nil, nil
+        SetAlert(btn, false)
     end
 
     bar:SetSize(width, height)
@@ -384,6 +407,7 @@ function Bar.RebuildAll()
     for _, bar in pairs(Bar.frames) do Bar.Rebuild(bar) end
     Bar.UpdateCooldowns()
     Bar.UpdateAuras()
+    Bar.UpdateSpellAlerts()
 end
 
 -- Объект длительности (Midnight): принимает secret-значения из аддона, как CustomAuraButton Blizzard
@@ -438,6 +462,46 @@ function Bar.UpdateAuras()
             btn.active = false
         end
         btn.checked:SetShown(btn.active == true)
+    end
+end
+
+local function HasRank(btn, spellID)
+    for _, id in ipairs(btn.entry.ranks) do
+        if id == spellID then return true end
+    end
+    return false
+end
+
+-- SPELL_ACTIVATION_OVERLAY_GLOW_SHOW/HIDE. Secret spellID не сравниваем — пропускаем
+function Bar.SetSpellAlert(spellID, show)
+    if issecret(spellID) then return end
+    for _, bar in pairs(Bar.frames) do
+        for _, btn in ipairs(bar.buttons) do
+            if btn.spellID and HasRank(btn, spellID) then SetAlert(btn, show) end
+        end
+    end
+end
+
+-- true/false — горит ли прок на любом ранге; nil — неизвестно (ответ secret)
+local IsOverlayed = C_SpellActivationOverlay and C_SpellActivationOverlay.IsSpellOverlayed
+
+local function OverlayState(ranks)
+    for _, id in ipairs(ranks) do
+        local overlayed = IsOverlayed(id)
+        if issecret(overlayed) then return nil end
+        if overlayed then return true end
+    end
+    return false
+end
+
+-- Текущее состояние вспышек (загрузка, /reload, пересборка); при неизвестном — не трогаем
+function Bar.UpdateSpellAlerts()
+    for _, bar in pairs(Bar.frames) do
+        for _, btn in ipairs(bar.buttons) do
+            local state = false
+            if btn.spellID and IsOverlayed then state = OverlayState(btn.entry.ranks) end
+            if state ~= nil then SetAlert(btn, state) end
+        end
     end
 end
 

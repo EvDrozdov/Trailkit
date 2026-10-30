@@ -130,6 +130,8 @@ function handlers.ADDON_LOADED(name)
     Register("PLAYER_SPECIALIZATION_CHANGED")
     Register("PLAYER_REGEN_ENABLED")
     Register("SPELL_UPDATE_COOLDOWN")
+    Register("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
+    Register("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
     Register("PLAYER_LOGOUT")
     frame:RegisterUnitEvent("UNIT_AURA", "player")
 end
@@ -150,6 +152,8 @@ end
 
 function handlers.SPELL_UPDATE_COOLDOWN() Bar.UpdateCooldowns() end
 function handlers.UNIT_AURA() Bar.UpdateAuras() end
+function handlers.SPELL_ACTIVATION_OVERLAY_GLOW_SHOW(spellID) Bar.SetSpellAlert(spellID, true) end
+function handlers.SPELL_ACTIVATION_OVERLAY_GLOW_HIDE(spellID) Bar.SetSpellAlert(spellID, false) end
 function handlers.PLAYER_LOGOUT() ns.DB.Backup() end
 
 frame:SetScript("OnEvent", function(_, event, ...) handlers[event](...) end)

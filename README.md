@@ -15,6 +15,7 @@ The client is detected automatically. Only spells you have learned are shown, so
 - Shows only the spells you have learned. Each button always casts the highest rank you know and updates automatically when you learn a new rank or change specialization.
 - Active aspect is highlighted with a border (any rank counts).
 - Cooldown swipe and countdown numbers on every icon.
+- Standard proc glow (spell activation overlay) when a spell lights up, same as on the default action bars.
 - Tooltips on hover.
 - Move panels when unlocked (out of combat only). Panels are locked by default.
 - Reorder icons with Shift + drag, like in FloAspectBar (out of combat, works whether the panels are locked or not).
