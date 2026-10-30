@@ -2,7 +2,7 @@
 ## Title: Trailkit
 ## Notes: Hunter aspect and trap bars.
 ## Author: Evgeny Drozdov
-## Version: 0.1.0
+## Version: 1.0.0
 ## SavedVariables: TrailkitDB
 ## SavedVariablesPerCharacter: TrailkitBackupDB
 
