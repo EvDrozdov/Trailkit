@@ -44,6 +44,18 @@ SETS.forever = {
         { key = "frost",      ranks = { 13809 } },                             -- Frost Trap
         { key = "explosive",  ranks = { 13813, 14316, 14317 } },               -- Explosive Trap
     },
+    -- Короткие названия в меню глазка отслеживания: spellID → ключ строки в Locales.
+    -- ID сверены по SpellName клиента Forever 1.60.1. Нет в списке — игровое название.
+    tracking = {
+        [1494]  = "TRACK_BEASTS",     -- Track Beasts
+        [19883] = "TRACK_HUMANOIDS",  -- Track Humanoids
+        [19884] = "TRACK_UNDEAD",     -- Track Undead
+        [19878] = "TRACK_DEMONS",     -- Track Demons
+        [19880] = "TRACK_ELEMENTALS", -- Track Elementals
+        [19882] = "TRACK_GIANTS",     -- Track Giants
+        [19879] = "TRACK_DRAGONKIN",  -- Track Dragonkin
+        [19885] = "TRACK_HIDDEN",     -- Track Hidden
+    },
 }
 
 ns.Spells = SETS[ns.client]

@@ -42,6 +42,14 @@ locales.enUS = {
     MSG_TRACKING_OFF = "Tracking button hidden. Type /tk tracking on to show it again.",
     MSG_TRACKING_USAGE = "Usage: /tk tracking on||off",
     HELP_TRACKING = "show or hide the tracking button at the minimap",
+    TRACK_BEASTS = "Beasts",
+    TRACK_HUMANOIDS = "Humanoids",
+    TRACK_UNDEAD = "Undead",
+    TRACK_DEMONS = "Demons",
+    TRACK_ELEMENTALS = "Elementals",
+    TRACK_GIANTS = "Giants",
+    TRACK_DRAGONKIN = "Dragonkin",
+    TRACK_HIDDEN = "Hidden",
 }
 
 locales.ruRU = {
@@ -82,6 +90,14 @@ locales.ruRU = {
     MSG_TRACKING_OFF = "Кнопка отслеживания скрыта. Введите /tk tracking on, чтобы вернуть её.",
     MSG_TRACKING_USAGE = "Использование: /tk tracking on||off",
     HELP_TRACKING = "показать или скрыть кнопку отслеживания у миникарты",
+    TRACK_BEASTS = "Звери",
+    TRACK_HUMANOIDS = "Гуманоиды",
+    TRACK_UNDEAD = "Нежить",
+    TRACK_DEMONS = "Демоны",
+    TRACK_ELEMENTALS = "Элементали",
+    TRACK_GIANTS = "Великаны",
+    TRACK_DRAGONKIN = "Драконы",
+    TRACK_HIDDEN = "Скрытые",
 }
 
 locales.deDE = {
@@ -122,6 +138,14 @@ locales.deDE = {
     MSG_TRACKING_OFF = "Verfolgungsschaltfläche ausgeblendet. Mit /tk tracking on wieder einblenden.",
     MSG_TRACKING_USAGE = "Verwendung: /tk tracking on||off",
     HELP_TRACKING = "Verfolgungsschaltfläche an der Minikarte ein- oder ausblenden",
+    TRACK_BEASTS = "Wildtiere",
+    TRACK_HUMANOIDS = "Humanoide",
+    TRACK_UNDEAD = "Untote",
+    TRACK_DEMONS = "Dämonen",
+    TRACK_ELEMENTALS = "Elementare",
+    TRACK_GIANTS = "Riesen",
+    TRACK_DRAGONKIN = "Drachkin",
+    TRACK_HIDDEN = "Verborgenes",
 }
 
 locales.frFR = {
@@ -162,6 +186,14 @@ locales.frFR = {
     MSG_TRACKING_OFF = "Bouton de pistage masqué. Tapez /tk tracking on pour le réafficher.",
     MSG_TRACKING_USAGE = "Utilisation : /tk tracking on||off",
     HELP_TRACKING = "afficher ou masquer le bouton de pistage près de la minicarte",
+    TRACK_BEASTS = "Bêtes",
+    TRACK_HUMANOIDS = "Humanoïdes",
+    TRACK_UNDEAD = "Morts-vivants",
+    TRACK_DEMONS = "Démons",
+    TRACK_ELEMENTALS = "Élémentaires",
+    TRACK_GIANTS = "Géants",
+    TRACK_DRAGONKIN = "Draconiens",
+    TRACK_HIDDEN = "Camouflés",
 }
 
 locales.esES = {
@@ -202,6 +234,14 @@ locales.esES = {
     MSG_TRACKING_OFF = "Botón de rastreo oculto. Escribe /tk tracking on para volver a mostrarlo.",
     MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
     HELP_TRACKING = "mostrar u ocultar el botón de rastreo junto al minimapa",
+    TRACK_BEASTS = "Bestias",
+    TRACK_HUMANOIDS = "Humanoides",
+    TRACK_UNDEAD = "No-muertos",
+    TRACK_DEMONS = "Demonios",
+    TRACK_ELEMENTALS = "Elementales",
+    TRACK_GIANTS = "Gigantes",
+    TRACK_DRAGONKIN = "Dragonantes",
+    TRACK_HIDDEN = "Ocultos",
 }
 
 -- Испанский для Латинской Америки пока совпадает с esES
@@ -245,6 +285,14 @@ locales.itIT = {
     MSG_TRACKING_OFF = "Pulsante di tracciamento nascosto. Digita /tk tracking on per mostrarlo di nuovo.",
     MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
     HELP_TRACKING = "mostra o nascondi il pulsante di tracciamento sulla minimappa",
+    TRACK_BEASTS = "Bestie",
+    TRACK_HUMANOIDS = "Umanoidi",
+    TRACK_UNDEAD = "Non morti",
+    TRACK_DEMONS = "Demoni",
+    TRACK_ELEMENTALS = "Elementali",
+    TRACK_GIANTS = "Giganti",
+    TRACK_DRAGONKIN = "Draghi",
+    TRACK_HIDDEN = "Nascosti",
 }
 
 locales.ptBR = {
@@ -285,6 +333,14 @@ locales.ptBR = {
     MSG_TRACKING_OFF = "Botão de rastreamento oculto. Digite /tk tracking on para exibi-lo novamente.",
     MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
     HELP_TRACKING = "mostrar ou ocultar o botão de rastreamento no minimapa",
+    TRACK_BEASTS = "Feras",
+    TRACK_HUMANOIDS = "Humanoides",
+    TRACK_UNDEAD = "Mortos-vivos",
+    TRACK_DEMONS = "Demônios",
+    TRACK_ELEMENTALS = "Elementais",
+    TRACK_GIANTS = "Gigantes",
+    TRACK_DRAGONKIN = "Dracônicos",
+    TRACK_HIDDEN = "Ocultos",
 }
 
 locales.koKR = {
@@ -325,6 +381,14 @@ locales.koKR = {
     MSG_TRACKING_OFF = "추적 버튼을 숨겼습니다. 다시 표시하려면 /tk tracking on 을 입력하세요.",
     MSG_TRACKING_USAGE = "사용법: /tk tracking on||off",
     HELP_TRACKING = "미니맵 추적 버튼 표시 또는 숨기기",
+    TRACK_BEASTS = "야수",
+    TRACK_HUMANOIDS = "인간형",
+    TRACK_UNDEAD = "언데드",
+    TRACK_DEMONS = "악마",
+    TRACK_ELEMENTALS = "정령",
+    TRACK_GIANTS = "거인",
+    TRACK_DRAGONKIN = "용족",
+    TRACK_HIDDEN = "은신",
 }
 
 locales.zhCN = {
@@ -365,6 +429,14 @@ locales.zhCN = {
     MSG_TRACKING_OFF = "已隐藏追踪按钮。输入 /tk tracking on 重新显示。",
     MSG_TRACKING_USAGE = "用法：/tk tracking on||off",
     HELP_TRACKING = "显示或隐藏小地图旁的追踪按钮",
+    TRACK_BEASTS = "野兽",
+    TRACK_HUMANOIDS = "人型生物",
+    TRACK_UNDEAD = "亡灵",
+    TRACK_DEMONS = "恶魔",
+    TRACK_ELEMENTALS = "元素生物",
+    TRACK_GIANTS = "巨人",
+    TRACK_DRAGONKIN = "龙类",
+    TRACK_HIDDEN = "隐藏",
 }
 
 locales.zhTW = {
@@ -405,6 +477,14 @@ locales.zhTW = {
     MSG_TRACKING_OFF = "已隱藏追蹤按鈕。輸入 /tk tracking on 重新顯示。",
     MSG_TRACKING_USAGE = "用法：/tk tracking on||off",
     HELP_TRACKING = "顯示或隱藏小地圖旁的追蹤按鈕",
+    TRACK_BEASTS = "野獸",
+    TRACK_HUMANOIDS = "人型生物",
+    TRACK_UNDEAD = "不死生物",
+    TRACK_DEMONS = "惡魔",
+    TRACK_ELEMENTALS = "元素生物",
+    TRACK_GIANTS = "巨人",
+    TRACK_DRAGONKIN = "龍類",
+    TRACK_HIDDEN = "隱藏",
 }
 
 -- Фолбэк: текущий язык -> enUS -> сам ключ

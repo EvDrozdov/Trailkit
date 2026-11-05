@@ -14,6 +14,9 @@ local HUNTER_TRACKING = HUNTER_TRACKING or 1
 -- Ability_EyeOfTheOwl — нейтральный глаз, когда ничего не включено
 local EYE_ICON = 132150
 local SIZE = 31
+-- Лёгкий зелёный фон активного пункта меню
+local ACTIVE_COLOR = { 0.2, 0.8, 0.2, 0.25 }
+local SHORT_NAMES = ns.Spells.tracking or {}
 
 local button, events
 
@@ -69,17 +72,28 @@ local function ToggleType(info)
     C_Minimap.SetTracking(info.index, not info.active)
 end
 
+-- Короткое название из словаря в Spells.lua, иначе игровое
+local function ShortName(info)
+    local key = info.spellID and SHORT_NAMES[info.spellID]
+    return key and L[key] or info.name
+end
+
+local function HighlightActive(button)
+    local bg = button:AttachTexture()
+    bg:SetDrawLayer("BACKGROUND")
+    bg:SetAllPoints()
+    bg:SetColorTexture(unpack(ACTIVE_COLOR))
+end
+
+-- Компактный список: иконка + короткое название, активный — зелёный фон,
+-- полное игровое название в тултипе
 local function OpenMenu(owner)
     MenuUtil.CreateContextMenu(owner, function(_, root)
-        root:CreateTitle(L.TRACKING)
         for _, info in ipairs(HunterTypes()) do
-            local text = ("|T%s:16:16:0:0:64:64:4:60:4:60|t %s"):format(info.texture, info.name)
-            root:CreateCheckbox(text,
-                function() return info.active end,
-                function()
-                    ToggleType(info)
-                    return MenuResponse.Close
-                end)
+            local text = ("|T%s:16:16:0:0:64:64:4:60:4:60|t %s"):format(info.texture, ShortName(info))
+            local item = root:CreateButton(text, function() ToggleType(info) end)
+            item:SetTooltip(function(tooltip) GameTooltip_SetTitle(tooltip, info.name) end)
+            if info.active then item:AddInitializer(HighlightActive) end
         end
     end)
 end

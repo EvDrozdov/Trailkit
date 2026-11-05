@@ -2,7 +2,7 @@
 
 ## 1.1.0 (unreleased)
 
-- **WoW Forever:** tracking button at the minimap edge. Shows the icon of your active hunter tracking (or a neutral eye if none is active); left-click opens a list of your hunter tracking types: click one to turn it on, click the active one again to turn it off.
+- **WoW Forever:** tracking button at the minimap edge. Shows the icon of your active hunter tracking (or a neutral eye if none is active); left-click opens a compact list of your hunter tracking types with short names (Beasts, Humanoids, Undead…; the full name is in the tooltip). The active one is highlighted; click a type to turn it on, click the active one again to turn it off.
 - The tracking button is built from the client's tracking list, so it shows exactly the tracking types your character knows, and hides when there are none.
 - Move it around the minimap with Shift + drag while the panels are unlocked; the position is saved.
 - Turn it on or off with *Tracking* in the right-click menu or `/tk tracking on|off`. On by default.
