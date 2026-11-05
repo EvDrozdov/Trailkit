@@ -59,13 +59,14 @@ local function DragOnUpdate()
     UpdatePosition()
 end
 
+-- Клик по активному виду выключает его, по неактивному — включает.
 -- В бою не переключаем: каст отслеживания может быть заблокирован
-local function SelectType(info)
+local function ToggleType(info)
     if InCombatLockdown() then
         ns.Print(L.MSG_COMBAT)
         return
     end
-    C_Minimap.SetTracking(info.index, true)
+    C_Minimap.SetTracking(info.index, not info.active)
 end
 
 local function OpenMenu(owner)
@@ -76,7 +77,7 @@ local function OpenMenu(owner)
             root:CreateCheckbox(text,
                 function() return info.active end,
                 function()
-                    SelectType(info)
+                    ToggleType(info)
                     return MenuResponse.Close
                 end)
         end
