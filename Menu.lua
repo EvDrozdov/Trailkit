@@ -25,6 +25,13 @@ function Menu.Open(bar)
                 ns.DB.Save()
             end)
 
+        -- Только в Forever: в других клиентах модуля нет
+        if ns.Tracking then
+            root:CreateCheckbox(L.TRACKING,
+                function() return ns.db.tracking.enabled end,
+                function() ns.Tracking.SetEnabled(not ns.db.tracking.enabled) end)
+        end
+
         local scale = root:CreateButton(L.SCALE)
         scale:SetEnabled(OutOfCombat)
         for _, value in ipairs(SCALES) do

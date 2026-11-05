@@ -35,6 +35,13 @@ locales.enUS = {
     HELP_RESET = "reset positions and show hidden panels",
     HELP_TEST = "toggle test mode with placeholder icons",
     HELP_HELP = "show this help",
+    TRACKING = "Tracking",
+    TRACKING_NONE = "No tracking",
+    TOOLTIP_TRACKING_MOVE = "Shift+drag: move around the minimap",
+    MSG_TRACKING_ON = "Tracking button shown.",
+    MSG_TRACKING_OFF = "Tracking button hidden. Type /tk tracking on to show it again.",
+    MSG_TRACKING_USAGE = "Usage: /tk tracking on||off",
+    HELP_TRACKING = "show or hide the tracking button at the minimap",
 }
 
 locales.ruRU = {
@@ -68,6 +75,13 @@ locales.ruRU = {
     HELP_RESET = "сбросить позиции и показать скрытые панели",
     HELP_TEST = "вкл/выкл тестовый режим с заглушками",
     HELP_HELP = "показать эту справку",
+    TRACKING = "Отслеживание",
+    TRACKING_NONE = "Отслеживание не выбрано",
+    TOOLTIP_TRACKING_MOVE = "Shift+перетаскивание: сдвинуть по краю миникарты",
+    MSG_TRACKING_ON = "Кнопка отслеживания включена.",
+    MSG_TRACKING_OFF = "Кнопка отслеживания скрыта. Введите /tk tracking on, чтобы вернуть её.",
+    MSG_TRACKING_USAGE = "Использование: /tk tracking on||off",
+    HELP_TRACKING = "показать или скрыть кнопку отслеживания у миникарты",
 }
 
 locales.deDE = {
@@ -101,6 +115,13 @@ locales.deDE = {
     HELP_RESET = "Positionen zurücksetzen und ausgeblendete Leisten zeigen",
     HELP_TEST = "Testmodus mit Platzhaltern umschalten",
     HELP_HELP = "diese Hilfe anzeigen",
+    TRACKING = "Verfolgung",
+    TRACKING_NONE = "Keine Verfolgung",
+    TOOLTIP_TRACKING_MOVE = "Umschalt+Ziehen: am Rand der Minikarte verschieben",
+    MSG_TRACKING_ON = "Verfolgungsschaltfläche eingeblendet.",
+    MSG_TRACKING_OFF = "Verfolgungsschaltfläche ausgeblendet. Mit /tk tracking on wieder einblenden.",
+    MSG_TRACKING_USAGE = "Verwendung: /tk tracking on||off",
+    HELP_TRACKING = "Verfolgungsschaltfläche an der Minikarte ein- oder ausblenden",
 }
 
 locales.frFR = {
@@ -134,6 +155,13 @@ locales.frFR = {
     HELP_RESET = "réinitialiser les positions et afficher les barres masquées",
     HELP_TEST = "activer/désactiver le mode test",
     HELP_HELP = "afficher cette aide",
+    TRACKING = "Pistage",
+    TRACKING_NONE = "Aucun pistage",
+    TOOLTIP_TRACKING_MOVE = "Maj+glisser : déplacer autour de la minicarte",
+    MSG_TRACKING_ON = "Bouton de pistage affiché.",
+    MSG_TRACKING_OFF = "Bouton de pistage masqué. Tapez /tk tracking on pour le réafficher.",
+    MSG_TRACKING_USAGE = "Utilisation : /tk tracking on||off",
+    HELP_TRACKING = "afficher ou masquer le bouton de pistage près de la minicarte",
 }
 
 locales.esES = {
@@ -167,6 +195,13 @@ locales.esES = {
     HELP_RESET = "restablecer posiciones y mostrar barras ocultas",
     HELP_TEST = "activar/desactivar el modo de prueba",
     HELP_HELP = "mostrar esta ayuda",
+    TRACKING = "Rastreo",
+    TRACKING_NONE = "Sin rastreo",
+    TOOLTIP_TRACKING_MOVE = "Mayús+arrastrar: mover alrededor del minimapa",
+    MSG_TRACKING_ON = "Botón de rastreo visible.",
+    MSG_TRACKING_OFF = "Botón de rastreo oculto. Escribe /tk tracking on para volver a mostrarlo.",
+    MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
+    HELP_TRACKING = "mostrar u ocultar el botón de rastreo junto al minimapa",
 }
 
 -- Испанский для Латинской Америки пока совпадает с esES
@@ -203,6 +238,13 @@ locales.itIT = {
     HELP_RESET = "ripristina le posizioni e mostra le barre nascoste",
     HELP_TEST = "attiva/disattiva la modalità test",
     HELP_HELP = "mostra questo aiuto",
+    TRACKING = "Tracciamento",
+    TRACKING_NONE = "Nessun tracciamento",
+    TOOLTIP_TRACKING_MOVE = "Maiusc+trascina: sposta lungo il bordo della minimappa",
+    MSG_TRACKING_ON = "Pulsante di tracciamento visibile.",
+    MSG_TRACKING_OFF = "Pulsante di tracciamento nascosto. Digita /tk tracking on per mostrarlo di nuovo.",
+    MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
+    HELP_TRACKING = "mostra o nascondi il pulsante di tracciamento sulla minimappa",
 }
 
 locales.ptBR = {
@@ -236,6 +278,13 @@ locales.ptBR = {
     HELP_RESET = "redefinir posições e mostrar barras ocultas",
     HELP_TEST = "ativar/desativar o modo de teste",
     HELP_HELP = "mostrar esta ajuda",
+    TRACKING = "Rastreamento",
+    TRACKING_NONE = "Nenhum rastreamento",
+    TOOLTIP_TRACKING_MOVE = "Shift+arrastar: mover pela borda do minimapa",
+    MSG_TRACKING_ON = "Botão de rastreamento exibido.",
+    MSG_TRACKING_OFF = "Botão de rastreamento oculto. Digite /tk tracking on para exibi-lo novamente.",
+    MSG_TRACKING_USAGE = "Uso: /tk tracking on||off",
+    HELP_TRACKING = "mostrar ou ocultar o botão de rastreamento no minimapa",
 }
 
 locales.koKR = {
@@ -269,6 +318,13 @@ locales.koKR = {
     HELP_RESET = "위치 초기화 및 숨긴 바 표시",
     HELP_TEST = "테스트 모드 켜기/끄기",
     HELP_HELP = "도움말 표시",
+    TRACKING = "추적",
+    TRACKING_NONE = "추적 없음",
+    TOOLTIP_TRACKING_MOVE = "Shift+드래그: 미니맵 가장자리를 따라 이동",
+    MSG_TRACKING_ON = "추적 버튼을 표시합니다.",
+    MSG_TRACKING_OFF = "추적 버튼을 숨겼습니다. 다시 표시하려면 /tk tracking on 을 입력하세요.",
+    MSG_TRACKING_USAGE = "사용법: /tk tracking on||off",
+    HELP_TRACKING = "미니맵 추적 버튼 표시 또는 숨기기",
 }
 
 locales.zhCN = {
@@ -302,6 +358,13 @@ locales.zhCN = {
     HELP_RESET = "重置位置并显示隐藏的动作条",
     HELP_TEST = "开关测试模式",
     HELP_HELP = "显示此帮助",
+    TRACKING = "追踪",
+    TRACKING_NONE = "未选择追踪",
+    TOOLTIP_TRACKING_MOVE = "Shift+拖动：沿小地图边缘移动",
+    MSG_TRACKING_ON = "已显示追踪按钮。",
+    MSG_TRACKING_OFF = "已隐藏追踪按钮。输入 /tk tracking on 重新显示。",
+    MSG_TRACKING_USAGE = "用法：/tk tracking on||off",
+    HELP_TRACKING = "显示或隐藏小地图旁的追踪按钮",
 }
 
 locales.zhTW = {
@@ -335,6 +398,13 @@ locales.zhTW = {
     HELP_RESET = "重設位置並顯示隱藏的快捷列",
     HELP_TEST = "切換測試模式",
     HELP_HELP = "顯示此說明",
+    TRACKING = "追蹤",
+    TRACKING_NONE = "未選擇追蹤",
+    TOOLTIP_TRACKING_MOVE = "Shift+拖曳：沿小地圖邊緣移動",
+    MSG_TRACKING_ON = "已顯示追蹤按鈕。",
+    MSG_TRACKING_OFF = "已隱藏追蹤按鈕。輸入 /tk tracking on 重新顯示。",
+    MSG_TRACKING_USAGE = "用法：/tk tracking on||off",
+    HELP_TRACKING = "顯示或隱藏小地圖旁的追蹤按鈕",
 }
 
 -- Фолбэк: текущий язык -> enUS -> сам ключ

@@ -75,6 +75,7 @@ local function PrintHelp()
     print("  /tk scale <0.5–2> — " .. L.HELP_SCALE)
     print("  /tk reset — " .. L.HELP_RESET)
     print("  /tk test — " .. L.HELP_TEST)
+    if ns.Tracking then print("  /tk tracking on||off — " .. L.HELP_TRACKING) end
     print("  /tk help — " .. L.HELP_HELP)
 end
 
@@ -98,6 +99,12 @@ SlashCmdList.TRAILKIT = function(msg)
         ns.ResetBars(nil)
     elseif cmd == "test" then
         ToggleTest()
+    elseif cmd == "tracking" and ns.Tracking then
+        if arg == "on" or arg == "off" then
+            ns.Tracking.SetEnabled(arg == "on")
+        else
+            ns.Print(L.MSG_TRACKING_USAGE)
+        end
     else
         PrintHelp()
     end
@@ -117,6 +124,7 @@ function handlers.ADDON_LOADED(name)
     ns.DB.Load()
     Bar.Create("aspects", L.ASPECTS)
     Bar.Create("traps", L.TRAPS)
+    if ns.Tracking then ns.Tracking.Init() end
 
     -- Нет текстуры ветки (например, в Forever) — стиль «Ночные эльфы» недоступен
     if not Bar.branchAvailable and ns.db.style == "nightelf" then

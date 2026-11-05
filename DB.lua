@@ -13,6 +13,8 @@ local DEFAULTS = {
         aspects = { point = "BOTTOMRIGHT", relPoint = "BOTTOM", x = -20, y = 160, scale = 1, hidden = false },
         traps   = { point = "BOTTOMLEFT",  relPoint = "BOTTOM", x = 20,  y = 160, scale = 1, hidden = false },
     },
+    -- Глазок отслеживания (только Forever); angle — положение на краю миникарты в градусах
+    tracking = { enabled = true, angle = 225 },
 }
 
 local POINTS = {
@@ -81,6 +83,12 @@ function DB.Load()
             order = CopyTable(Pick(s, "order", IsOrder, {})),
         }
     end
+
+    local t = { Sub(first, "tracking"), Sub(second, "tracking") }
+    db.tracking = {
+        enabled = Pick(t, "enabled", IsBool, DEFAULTS.tracking.enabled),
+        angle = Pick(t, "angle", IsNumber, DEFAULTS.tracking.angle),
+    }
 
     TrailkitDB = db
     ns.db = db

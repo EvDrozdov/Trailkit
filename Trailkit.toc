@@ -11,4 +11,5 @@ Spells.lua
 DB.lua
 Bar.lua
 Menu.lua
+Tracking.lua
 Core.lua
