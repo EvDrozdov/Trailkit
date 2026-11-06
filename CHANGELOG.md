@@ -8,6 +8,7 @@
 - Turn it on or off with *Tracking* in the right-click menu or `/tk tracking on|off`. On by default.
 - Tracking cannot be switched in combat; a chat message tells you so.
 - Fixed: the active aspect highlight could disappear during or right after combat while the aspect was still active. The highlight now turns off only when the aspect is definitely gone, and is rechecked a few times after combat.
+- Fixed a Lua error in combat on WoW Forever ("Auras cannot be accessed when secret"): the full buff scan is skipped while auras are secret.
 - `/tk debug on|off` prints aspect highlight changes and aura API results to chat (off by default).
 
 ## 1.0.0

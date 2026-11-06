@@ -453,15 +453,25 @@ local function Show(v)
     return tostring(v)
 end
 
+-- Разрешён ли сейчас полный просмотр баффов. При засекреченных аурах GetAuraDataByIndex
+-- (RequiresUnitAuraAccess) бросает ошибку, а не возвращает secret. Без C_Secrets — только вне боя
+local function CanScanAuras()
+    if C_Secrets and C_Secrets.ShouldAurasBeSecret then
+        local ok, secret = pcall(C_Secrets.ShouldAurasBeSecret)
+        if ok and not issecret(secret) then return not secret end
+    end
+    return not InCombatLockdown()
+end
+
 -- Полный просмотр баффов игрока. true — аспект найден; false — однозначно нет;
--- nil — неизвестно (secret, пустой список при живом игроке — данные могли не прийти)
+-- nil — неизвестно (secret, ошибка API, пустой список при живом игроке — данные могли не прийти)
 local function ScanAuras(ranks)
     local wanted = {}
     for _, id in ipairs(ranks) do wanted[id] = true end
     local count = 0
     while true do
-        local data = C_UnitAuras.GetAuraDataByIndex("player", count + 1, "HELPFUL")
-        if issecret(data) then return nil end
+        local ok, data = pcall(C_UnitAuras.GetAuraDataByIndex, "player", count + 1, "HELPFUL")
+        if not ok or issecret(data) then return nil end
         if not data then break end
         if issecret(data.spellId) then return nil end
         if wanted[data.spellId] then return true end
@@ -474,12 +484,16 @@ end
 
 -- true/false — активен ли аспект; nil — неизвестно. Второе значение — строка для отладки.
 -- nil и secret от GetPlayerAuraBySpellID ответом «нет» не считаются: «нет» даёт только ScanAuras.
+-- GetPlayerAuraBySpellID (RequiresNonSecretAura) при секретной ауре не бросает, а возвращает nil —
+-- поэтому его зовём и в бою; ошибка (pcall) — «неизвестно».
 local function AuraState(ranks)
     for _, id in ipairs(ranks) do
-        local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
+        local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, id)
+        if not ok then return nil, "byID=error" end
         if issecret(aura) then return nil, "byID=secret" end
         if aura then return true, "byID=true" end
     end
+    if not CanScanAuras() then return nil, "byID=nil scan=skipped (secret)" end
     local state = ScanAuras(ranks)
     return state, "byID=nil scan=" .. Show(state)
 end
