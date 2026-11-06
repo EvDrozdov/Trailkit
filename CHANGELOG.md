@@ -9,6 +9,7 @@
 - Tracking cannot be switched in combat; a chat message tells you so.
 - Fixed: the active aspect highlight could disappear during or right after combat while the aspect was still active. The highlight now turns off only when the aspect is definitely gone, and is rechecked a few times after combat.
 - Fixed a Lua error in combat on WoW Forever ("Auras cannot be accessed when secret"): the full buff scan is skipped while auras are secret.
+- The active aspect highlight now follows your aspect casts, so it switches in combat too, wherever you cast from (Trailkit button, action bar or key binding). Auras are still rechecked after combat to confirm it.
 - `/tk debug on|off` prints aspect highlight changes and aura API results to chat (off by default).
 
 ## 1.0.0

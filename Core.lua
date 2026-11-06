@@ -156,6 +156,7 @@ function handlers.ADDON_LOADED(name)
     Register("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
     Register("PLAYER_LOGOUT")
     frame:RegisterUnitEvent("UNIT_AURA", "player")
+    frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 end
 
 function handlers.PLAYER_LOGIN()
@@ -175,6 +176,7 @@ end
 
 function handlers.SPELL_UPDATE_COOLDOWN() Bar.UpdateCooldowns() end
 function handlers.UNIT_AURA() Bar.UpdateAuras() end
+function handlers.UNIT_SPELLCAST_SUCCEEDED(_, _, spellID) Bar.OnPlayerCast(spellID) end
 function handlers.SPELL_ACTIVATION_OVERLAY_GLOW_SHOW(spellID) Bar.SetSpellAlert(spellID, true) end
 function handlers.SPELL_ACTIVATION_OVERLAY_GLOW_HIDE(spellID) Bar.SetSpellAlert(spellID, false) end
 function handlers.PLAYER_LOGOUT() ns.DB.Backup() end

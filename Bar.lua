@@ -560,6 +560,25 @@ local function HasRank(btn, spellID)
     return false
 end
 
+-- UNIT_SPELLCAST_SUCCEEDED игрока: смена аспекта по касту, работает и в бою, когда ауры secret.
+-- spellID игрока не secret (SecretWhenUnitSpellCastRestricted — только чужие юниты),
+-- но спелл может быть помечен «всегда secret» — такой пропускаем.
+-- Активен только один аспект: найденный включаем, остальные гасим
+function Bar.OnPlayerCast(spellID)
+    if issecret(spellID) then return end
+    local buttons = Bar.frames.aspects.buttons
+    local cast
+    for _, btn in ipairs(buttons) do
+        if btn.entry and HasRank(btn, spellID) then cast = btn break end
+    end
+    if not cast then return end
+    Debug("cast: " .. cast.entry.key)
+    for _, btn in ipairs(buttons) do
+        btn.active = btn == cast
+        btn.checked:SetShown(btn.active)
+    end
+end
+
 -- SPELL_ACTIVATION_OVERLAY_GLOW_SHOW/HIDE. Secret spellID не сравниваем — пропускаем
 function Bar.SetSpellAlert(spellID, show)
     if issecret(spellID) then return end
