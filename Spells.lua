@@ -28,14 +28,14 @@ SETS.midnight = {
     },
 }
 
--- WoW Forever. ID взяты из классики — сверить на Forever.
+-- WoW Forever. ID рангов сверены по SpellName/SkillLineAbility клиента Forever 1.60.1.70790.
 SETS.forever = {
     aspects = {
         { key = "monkey",  ranks = { 13163 } },                                           -- Aspect of the Monkey
         { key = "hawk",    ranks = { 13165, 14318, 14319, 14320, 14321, 14322, 25296 } }, -- Aspect of the Hawk
         { key = "cheetah", ranks = { 5118 } },                                            -- Aspect of the Cheetah
         { key = "pack",    ranks = { 13159 } },                                           -- Aspect of the Pack
-        { key = "beast",   ranks = { 13161 } },                                           -- Aspect of the Beast
+        { key = "beast",   ranks = { 13161, 1299445, 1299446, 1299447 } },                -- Aspect of the Beast (ранги 2–4 новые в Forever)
         { key = "wild",    ranks = { 20043, 20190 } },                                    -- Aspect of the Wild
     },
     traps = {
