@@ -442,6 +442,10 @@ function Bar.UpdateCooldowns()
     end
 end
 
+-- В Forever одновременно активен только один аспект; в Midnight аспекты — независимые
+-- временные баффы, каждый проверяется сам по себе
+local EXCLUSIVE_ASPECTS = ns.client == "forever"
+
 -- Отладка подсветки (/tk debug on|off), строки не локализуются
 local function Debug(msg)
     if ns.debug then ns.Print("[debug] " .. msg) end
@@ -516,8 +520,8 @@ function Bar.UpdateAuras()
     local resolved = true
     for i, btn in ipairs(buttons) do
         local state = states[i]
-        -- одновременно активен только один аспект: найденный однозначно гасит остальные
-        if state == nil and anyActive then
+        -- Forever: одновременно активен только один аспект — найденный однозначно гасит остальные
+        if state == nil and anyActive and EXCLUSIVE_ASPECTS then
             state, info[i] = false, info[i] .. " (other aspect active)"
         end
         if state == nil then resolved = false end
@@ -563,7 +567,7 @@ end
 -- UNIT_SPELLCAST_SUCCEEDED игрока: смена аспекта по касту, работает и в бою, когда ауры secret.
 -- spellID игрока не secret (SecretWhenUnitSpellCastRestricted — только чужие юниты),
 -- но спелл может быть помечен «всегда secret» — такой пропускаем.
--- Активен только один аспект: найденный включаем, остальные гасим
+-- Найденный аспект включаем; в Forever (активен только один) остальные гасим
 function Bar.OnPlayerCast(spellID)
     if issecret(spellID) then return end
     local buttons = Bar.frames.aspects.buttons
@@ -574,8 +578,10 @@ function Bar.OnPlayerCast(spellID)
     if not cast then return end
     Debug("cast: " .. cast.entry.key)
     for _, btn in ipairs(buttons) do
-        btn.active = btn == cast
-        btn.checked:SetShown(btn.active)
+        if btn == cast or EXCLUSIVE_ASPECTS then
+            btn.active = btn == cast
+            btn.checked:SetShown(btn.active)
+        end
     end
 end
 
