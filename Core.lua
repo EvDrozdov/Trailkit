@@ -4,6 +4,7 @@ local L = ns.L
 local Bar = ns.Bar
 
 ns.testMode = false
+ns.debug = false -- /tk debug on|off, не сохраняется
 
 function ns.Print(msg)
     print("|cffaad372Trailkit|r: " .. msg)
@@ -99,6 +100,19 @@ SlashCmdList.TRAILKIT = function(msg)
         ns.ResetBars(nil)
     elseif cmd == "test" then
         ToggleTest()
+    elseif cmd == "debug" then
+        -- отладка подсветки аспектов; строки не локализуются
+        if arg == "on" or arg == "off" then
+            ns.debug = arg == "on"
+            ns.Print("debug " .. arg)
+            if ns.debug then
+                -- сбросить запомненные ответы, чтобы сразу вывести текущее состояние
+                for _, btn in ipairs(Bar.frames.aspects.buttons) do btn.lastInfo = nil end
+                Bar.UpdateAuras()
+            end
+        else
+            ns.Print("usage: /tk debug on|off")
+        end
     elseif cmd == "tracking" and ns.Tracking then
         if arg == "on" or arg == "off" then
             ns.Tracking.SetEnabled(arg == "on")
@@ -156,6 +170,7 @@ function handlers.PLAYER_SPECIALIZATION_CHANGED() Bar.RebuildAll() end
 
 function handlers.PLAYER_REGEN_ENABLED()
     if Bar.pending then Bar.RebuildAll() end
+    Bar.RecheckAuras()
 end
 
 function handlers.SPELL_UPDATE_COOLDOWN() Bar.UpdateCooldowns() end

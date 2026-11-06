@@ -442,27 +442,101 @@ function Bar.UpdateCooldowns()
     end
 end
 
--- true/false — активен ли аспект; nil — неизвестно (аура secret)
-local function AuraState(ranks)
-    for _, id in ipairs(ranks) do
-        local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
-        if issecret(aura) then return nil end
-        if aura then return true end
+-- Отладка подсветки (/tk debug on|off), строки не локализуются
+local function Debug(msg)
+    if ns.debug then ns.Print("[debug] " .. msg) end
+end
+
+-- Значение API для отладки: true/false/nil/secret
+local function Show(v)
+    if issecret(v) then return "secret" end
+    return tostring(v)
+end
+
+-- Полный просмотр баффов игрока. true — аспект найден; false — однозначно нет;
+-- nil — неизвестно (secret, пустой список при живом игроке — данные могли не прийти)
+local function ScanAuras(ranks)
+    local wanted = {}
+    for _, id in ipairs(ranks) do wanted[id] = true end
+    local count = 0
+    while true do
+        local data = C_UnitAuras.GetAuraDataByIndex("player", count + 1, "HELPFUL")
+        if issecret(data) then return nil end
+        if not data then break end
+        if issecret(data.spellId) then return nil end
+        if wanted[data.spellId] then return true end
+        count = count + 1
     end
+    -- аспекты слетают при смерти; иначе пустой список не считаем ответом
+    if count == 0 and not UnitIsDeadOrGhost("player") then return nil end
     return false
 end
 
--- Активный аспект — стандартная подсветка «checked»; при неизвестном состоянии держим последнее
+-- true/false — активен ли аспект; nil — неизвестно. Второе значение — строка для отладки.
+-- nil и secret от GetPlayerAuraBySpellID ответом «нет» не считаются: «нет» даёт только ScanAuras.
+local function AuraState(ranks)
+    for _, id in ipairs(ranks) do
+        local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
+        if issecret(aura) then return nil, "byID=secret" end
+        if aura then return true, "byID=true" end
+    end
+    local state = ScanAuras(ranks)
+    return state, "byID=nil scan=" .. Show(state)
+end
+
+-- Активный аспект — стандартная подсветка «checked»; при неизвестном состоянии держим последнее.
+-- Возвращает true, если для всех кнопок получен однозначный ответ.
 function Bar.UpdateAuras()
-    for _, btn in ipairs(Bar.frames.aspects.buttons) do
+    local buttons = Bar.frames.aspects.buttons
+    local states, info = {}, {}
+    local anyActive = false
+    for i, btn in ipairs(buttons) do
         if btn.spellID then
-            local state = AuraState(btn.entry.ranks)
-            if state ~= nil then btn.active = state end
+            states[i], info[i] = AuraState(btn.entry.ranks)
         else
-            btn.active = false
+            states[i], info[i] = false, "no spell"
+        end
+        if states[i] then anyActive = true end
+    end
+
+    local resolved = true
+    for i, btn in ipairs(buttons) do
+        local state = states[i]
+        -- одновременно активен только один аспект: найденный однозначно гасит остальные
+        if state == nil and anyActive then
+            state, info[i] = false, info[i] .. " (other aspect active)"
+        end
+        if state == nil then resolved = false end
+        local name = btn.entry and btn.entry.key or tostring(i)
+        if info[i] ~= btn.lastInfo then
+            btn.lastInfo = info[i]
+            Debug(name .. ": " .. info[i])
+        end
+        if state ~= nil and state ~= btn.active then
+            Debug(name .. ": highlight " .. Show(btn.active) .. " -> " .. Show(state))
+            btn.active = state
         end
         btn.checked:SetShown(btn.active == true)
     end
+    return resolved
+end
+
+-- После боя данные аур приходят не сразу: сразу, через 0.5 с и через 2 с, пока нет ответа
+local RECHECK_DELAYS = { 0.5, 1.5 } -- интервалы между попытками (итого 0.5 и 2 с)
+local recheckToken = 0
+
+function Bar.RecheckAuras()
+    recheckToken = recheckToken + 1
+    local token = recheckToken
+    local function Try(step)
+        if token ~= recheckToken then return end -- запущена новая серия
+        local resolved = Bar.UpdateAuras()
+        Debug("recheck #" .. step .. (resolved and ": resolved" or ": unknown"))
+        if not resolved and RECHECK_DELAYS[step] then
+            C_Timer.After(RECHECK_DELAYS[step], function() Try(step + 1) end)
+        end
+    end
+    Try(1)
 end
 
 local function HasRank(btn, spellID)
